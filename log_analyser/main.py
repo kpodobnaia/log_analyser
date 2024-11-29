@@ -95,7 +95,7 @@ def main(
         is_flag=True,
         help="Events per second",
     ),
-    total_amount_of_bytes_exchanged: bool = typer.Option(
+    total_amount_of_bytes: bool = typer.Option(
         False,
         f"--{MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED}",
         is_flag=True,
@@ -113,7 +113,7 @@ def main(
         MetricsCode.MOST_FREQUENT_IP: most_frequent_ip,
         MetricsCode.LEAST_FREQUENT_IP: least_frequent_ip,
         MetricsCode.EVENTS_PER_SECOND: events_per_second,
-        MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED: total_amount_of_bytes_exchanged,
+        MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED: total_amount_of_bytes,
     }
 
     if not any(options.values()):
