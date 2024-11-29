@@ -7,9 +7,8 @@ import typer
 
 from log_analyser.metrics import (
     MetricsCode,
-    IPFrequencyMetrics,
-    EventsPerRecordMetrics,
-    TotalAmountOfBytesExchanged,
+    IPFrequencyMetric,
+    EventsPerRecordMetric,
 )
 from log_analyser.readers import get_file_reader
 from log_analyser.writers import get_file_writer
@@ -76,25 +75,25 @@ def main(
     ),
     most_frequent_ip: bool = typer.Option(
         False,
-        f"--{MetricsCode.MOST_FREQUENT_IP.value}",
+        f"--{MetricsCode.MOST_FREQUENT_IP}",
         is_flag=True,
         help="Most frequent IP",
     ),
     least_frequent_ip: bool = typer.Option(
         False,
-        f"--{MetricsCode.LEAST_FREQUENT_IP.value}",
+        f"--{MetricsCode.LEAST_FREQUENT_IP}",
         is_flag=True,
         help="Least frequent IP",
     ),
     events_per_second: bool = typer.Option(
         False,
-        f"--{MetricsCode.EVENTS_PER_SECOND.value}",
+        f"--{MetricsCode.EVENTS_PER_SECOND}",
         is_flag=True,
         help="Events per second",
     ),
     total_amount_of_bytes_exchanged: bool = typer.Option(
         False,
-        f"--{MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED.value}",
+        f"--{MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED}",
         is_flag=True,
         help="Total amount of bytes exchanged",
     ),
@@ -105,9 +104,9 @@ def main(
     metrics = []
     try:
         if most_frequent_ip or least_frequent_ip:
-            metrics.append(IPFrequencyMetrics())
+            metrics.append(IPFrequencyMetric())
         if events_per_second:
-            metrics.append(EventsPerRecordMetrics())
+            metrics.append(EventsPerRecordMetric())
         if total_amount_of_bytes_exchanged:
             metrics.append(TotalAmountOfBytesExchanged())
 
