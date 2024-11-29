@@ -9,11 +9,8 @@ from log_analyser.exceptions import InvalidDataFormatError
 from log_analyser.io import output_writer, input_parser
 from log_analyser.metrics import (
     MetricsCode,
-    IPFrequencyMetric,
-    EventsPerRecordMetric,
-    TotalAmountOfBytesExchangedMetric,
+    metrics_provider,
 )
-from log_analyser.metrics.base import Metric
 
 fmt = "%(message)s"
 logging.basicConfig(level=logging.INFO, format=fmt)
@@ -112,18 +109,21 @@ def main(
     output_writer.select_strategy(output_format)
     input_parser.select_strategy(input_format)
 
-    metrics: List[Metric] = []
-    try:
-        if most_frequent_ip or least_frequent_ip:
-            metrics.append(IPFrequencyMetric())
-        if events_per_second:
-            metrics.append(EventsPerRecordMetric())
-        if total_amount_of_bytes_exchanged:
-            metrics.append(TotalAmountOfBytesExchangedMetric())
+    options = {
+        MetricsCode.MOST_FREQUENT_IP: most_frequent_ip,
+        MetricsCode.LEAST_FREQUENT_IP: least_frequent_ip,
+        MetricsCode.EVENTS_PER_SECOND: events_per_second,
+        MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED: total_amount_of_bytes_exchanged,
+    }
 
-        if not metrics:
-            logger.error("No option was provided for analysis")
-            raise typer.Exit()
+    if not any(options.values()):
+        logger.error("No option was provided for analysis")
+        raise typer.Exit()
+
+    try:
+        metrics = metrics_provider.provide_metrics(
+            [option for option, enabled in options.items() if enabled]
+        )
 
         logs_parsers = [
             input_parser.parse(input_file) for input_file in input_file_paths
@@ -132,7 +132,12 @@ def main(
             analyze_multiple_log_sources(logs_parsers, metrics)
         )
 
-        output_writer.write(output_file_path, summary)
+        # trade-off for allowing to process multiple options by the same metric
+        filtered_summary = {
+            key: value for key, value in summary.items() if key in options
+        }
+
+        output_writer.write(output_file_path, filtered_summary)
 
     except (InvalidDataFormatError, NotImplementedError) as e:
         logger.error(e)

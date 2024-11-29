@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-from log_analyser.metrics import EventsPerRecordMetric, MetricsCode
+from log_analyser.metrics import MetricsCode
+from log_analyser.metrics.events_per_second import EventsPerRecordMetric
 
 
 def test_events_per_second():
