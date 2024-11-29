@@ -5,13 +5,14 @@ from typing import Annotated, Any, List
 
 import typer
 
+from log_analyser.io import output_writer
 from log_analyser.metrics import (
     MetricsCode,
     IPFrequencyMetric,
     EventsPerRecordMetric,
+    TotalAmountOfBytesExchangedMetric
 )
 from log_analyser.readers import get_file_reader
-from log_analyser.writers import get_file_writer
 
 fmt = "%(message)s"
 logging.basicConfig(level=logging.INFO, format=fmt)
@@ -101,6 +102,8 @@ def main(
     """A command-line tool to analyze the content of log files. The tool accepts the log file
     location(s) and operation(s) as input arguments and return the results of the operations as output.
     """
+    output_writer.select_strategy(output_format)
+
     metrics = []
     try:
         if most_frequent_ip or least_frequent_ip:
@@ -108,7 +111,7 @@ def main(
         if events_per_second:
             metrics.append(EventsPerRecordMetric())
         if total_amount_of_bytes_exchanged:
-            metrics.append(TotalAmountOfBytesExchanged())
+            metrics.append(TotalAmountOfBytesExchangedMetric())
 
         if not metrics:
             logger.error("No option was provided for analysis")
@@ -117,8 +120,8 @@ def main(
         file_reader = get_file_reader(input_format)
         logs_readers = [file_reader(input_file) for input_file in input_file_paths]
         summary = asyncio.run(analyze_multiple_log_sources(logs_readers, metrics))
-        summary_writer = get_file_writer(output_format)(output_file_path)
-        summary_writer(summary)
+
+        output_writer.write(output_file_path, summary)
 
     except NotImplementedError as e:
         logger.error(e)
