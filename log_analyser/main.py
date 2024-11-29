@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import sys
 from pathlib import Path
 from typing import Annotated, Any, List
 
@@ -12,8 +13,12 @@ from log_analyser.metrics import (
     metrics_provider,
 )
 
-fmt = "%(message)s"
-logging.basicConfig(level=logging.INFO, format=fmt)
+fmt = "[%(asctime)s] [%(levelname)s] %(message)s"
+logging.basicConfig(
+    level=logging.INFO,
+    format=fmt,
+    handlers=[logging.StreamHandler(stream=sys.stdout)],
+)
 logger = logging.getLogger(__name__)
 
 
@@ -47,6 +52,25 @@ async def analyze_multiple_log_sources(log_readers, metrics) -> dict[str, Any]:
     for metric in metrics:
         summary |= metric.summarize()
     return summary
+
+
+async def analyser(
+    logs_parsers, output_writer, output_file_path, metrics, options
+):
+    summary = await analyze_multiple_log_sources(logs_parsers, metrics)
+
+    # trade-off for allowing to process multiple options by the same metric
+    filtered_summary = {
+        key: value
+        for key, value in summary.items()
+        if key in options and options[key]
+    }
+
+    output_writer.write(output_file_path, filtered_summary)
+    logger.info(
+        "Saved analysis summary into a file %s",
+        str(output_file_path),
+    )
 
 
 # @app.command()
@@ -106,6 +130,10 @@ def main(
     The tool accepts the log file location(s) and operation(s) as
     input arguments and return the results of the operations as output.
     """
+    logger.info(
+        "Start analysing logs in files: %s",
+        ", ".join([str(f) for f in input_file_paths]),
+    )
     output_writer.select_strategy(output_format)
     input_parser.select_strategy(input_format)
 
@@ -128,21 +156,14 @@ def main(
         logs_parsers = [
             input_parser.parse(input_file) for input_file in input_file_paths
         ]
-        summary = asyncio.run(
-            analyze_multiple_log_sources(logs_parsers, metrics)
+        asyncio.run(
+            analyser(
+                logs_parsers, output_writer, output_file_path, metrics, options
+            )
         )
-
-        # trade-off for allowing to process multiple options by the same metric
-        filtered_summary = {
-            key: value for key, value in summary.items() if key in options
-        }
-
-        output_writer.write(output_file_path, filtered_summary)
 
     except (InvalidDataFormatError, NotImplementedError) as e:
         logger.error(e)
-
-    logger.info("Finished.")
 
 
 if __name__ == "__main__":

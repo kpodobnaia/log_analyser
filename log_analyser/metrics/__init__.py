@@ -5,9 +5,12 @@ from .metrics_codes import MetricsCode
 from .total_amount_of_bytes_exchanged import TotalAmountOfBytesExchangedMetric
 
 metrics_provider = MetricsProvider()
-metrics_provider.register("mfit", IPFrequencyMetric)
-metrics_provider.register("lfit", IPFrequencyMetric)
-metrics_provider.register("eps", EventsPerRecordMetric)
-metrics_provider.register("bytes", TotalAmountOfBytesExchangedMetric)
+metrics_provider.register(MetricsCode.MOST_FREQUENT_IP, IPFrequencyMetric)
+metrics_provider.register(MetricsCode.LEAST_FREQUENT_IP, IPFrequencyMetric)
+metrics_provider.register(MetricsCode.EVENTS_PER_SECOND, EventsPerRecordMetric)
+metrics_provider.register(
+    MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED,
+    TotalAmountOfBytesExchangedMetric,
+)
 
 __all__ = ["MetricsCode", "metrics_provider"]

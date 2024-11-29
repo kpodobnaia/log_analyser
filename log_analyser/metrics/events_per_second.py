@@ -31,5 +31,5 @@ class EventsPerRecordMetric(Metric):
         if time_interval == 0 or self._events_count == 0:
             return {}
 
-        result = round(self._events_count / time_interval, 1)
+        result = self._events_count / time_interval
         return {"eps": result}
