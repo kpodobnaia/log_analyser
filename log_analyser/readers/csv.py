@@ -1,9 +1,12 @@
 import csv
+import logging
 from datetime import datetime
 from pathlib import Path
 
 from log_analyser.log import LogEntry
 from log_analyser.readers.registry import register_reader
+
+logger = logging.getLogger(__name__)
 
 
 def parse_csv_row(fields: list[str]) -> LogEntry:
@@ -24,13 +27,18 @@ def parse_csv_row(fields: list[str]) -> LogEntry:
 
 
 @register_reader("csv")
-def csv_reader(file_path: Path):
-    with open(file_path) as f:
+def csv_log_parser(file_path: Path):
+    with file_path.open("r+t") as f:
         reader = csv.reader(f, delimiter=" ", skipinitialspace=True)
         for row in reader:
             if not row:
                 continue
             try:
                 yield parse_csv_row(row)
-            except Exception:
+            except Exception as e:
+                logger.warning(
+                    "Could not parse a line from CSV. Skipping. %s %s",
+                    file_path,
+                    str(e),
+                )
                 continue
