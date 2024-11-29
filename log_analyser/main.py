@@ -10,8 +10,9 @@ from log_analyser.metrics import (
     MetricsCode,
     IPFrequencyMetric,
     EventsPerRecordMetric,
-    TotalAmountOfBytesExchangedMetric
+    TotalAmountOfBytesExchangedMetric,
 )
+from log_analyser.metrics.base import Metric
 from log_analyser.readers import get_file_reader
 
 fmt = "%(message)s"
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 # app = typer.Typer()
 
 
-async def collect_metrics_from_logs(log_reader, metrics) -> dict[str, Any]:
+async def collect_metrics_from_logs(log_reader, metrics):
     for log in log_reader:
         for metric in metrics:
             metric.collect(log)
@@ -30,9 +31,12 @@ async def collect_metrics_from_logs(log_reader, metrics) -> dict[str, Any]:
 
 async def analyze_multiple_log_sources(log_readers, metrics) -> dict[str, Any]:
     """
-    Analyze multiple log sources by creating a task for each of the `log_readers` and return their common
-    :param log_readers: iterators that read lines from a selected file and parse them into Log objects
-    :param metrics: Metrics objects that collect the statistics from all `log_readers` and summarize their common result
+    Analyze multiple log sources by creating a task for each of
+    the `log_readers` and return their common
+    :param log_readers: iterators that read lines from a selected file and
+            parse them into Log objects
+    :param metrics: Metrics objects that collect the statistics from all
+            `log_readers` and summarize their common result
     :return:
     """
     tasks = [
@@ -41,7 +45,7 @@ async def analyze_multiple_log_sources(log_readers, metrics) -> dict[str, Any]:
     ]
     await asyncio.gather(*tasks)
 
-    summary = {}
+    summary: dict[str, Any] = {}
     # metric objects accumulate the statistics for logs from all sources
     for metric in metrics:
         summary |= metric.summarize()
@@ -70,7 +74,9 @@ def main(
             help="Path to a file to save output in plain text",
         ),
     ],
-    input_format: str = typer.Option("csv", help="Expected format of the input files"),
+    input_format: str = typer.Option(
+        "csv", help="Expected format of the input files"
+    ),
     output_format: str = typer.Option(
         "json", help="Expected format of the output file"
     ),
@@ -99,12 +105,13 @@ def main(
         help="Total amount of bytes exchanged",
     ),
 ) -> None:
-    """A command-line tool to analyze the content of log files. The tool accepts the log file
-    location(s) and operation(s) as input arguments and return the results of the operations as output.
+    """A command-line tool to analyze the content of log files.
+    The tool accepts the log file location(s) and operation(s) as
+    input arguments and return the results of the operations as output.
     """
     output_writer.select_strategy(output_format)
 
-    metrics = []
+    metrics: List[Metric] = []
     try:
         if most_frequent_ip or least_frequent_ip:
             metrics.append(IPFrequencyMetric())
@@ -118,8 +125,12 @@ def main(
             raise typer.Exit()
 
         file_reader = get_file_reader(input_format)
-        logs_readers = [file_reader(input_file) for input_file in input_file_paths]
-        summary = asyncio.run(analyze_multiple_log_sources(logs_readers, metrics))
+        logs_readers = [
+            file_reader(input_file) for input_file in input_file_paths
+        ]
+        summary = asyncio.run(
+            analyze_multiple_log_sources(logs_readers, metrics)
+        )
 
         output_writer.write(output_file_path, summary)
 

@@ -5,7 +5,10 @@ from log_analyser.metrics.base import Metric
 
 
 class TotalAmountOfBytesExchangedMetric(Metric):
-    """Total amount of bytes exchanged is the metric that takes into response size in bytes."""
+    """
+    Total amount of bytes exchanged is the metric that takes into response
+    size in bytes.
+    """
 
     def __init__(self):
         self._total_amount = 0

@@ -11,4 +11,7 @@ class JSONOutputWriterStrategy(OutputWriterStrategy):
         try:
             file_path.write_text(json.dumps(content))
         except Exception as e:
-            raise InvalidDataFormatError(f"Could not save data to a file {file_path.absolute()}. {str(e)}")
+            raise InvalidDataFormatError(
+                f"Could not save data to a file "
+                f"{file_path.absolute()}. {str(e)}"
+            )

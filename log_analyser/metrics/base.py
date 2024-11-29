@@ -6,7 +6,7 @@ from log_analyser.log import LogEntry
 
 class Metric(abc.ABC):
     def collect(self, log: LogEntry) -> None:
-        raise NotImplemented
+        raise NotImplementedError
 
     def summarize(self) -> Any:
-        raise NotImplemented
+        raise NotImplementedError
