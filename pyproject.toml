@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "log-analyser"
+version = "0.1.0"
+description = "A command-line tool to analyze the content of log files"
+authors = ["Kristina Podobnaia <kristina_podobnaia@epam.com>"]
+readme = "README.md"
+packages = [{ include = "log_analyser" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+typer = { extras = ["all"], version = "^0.13.1" }
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+black = "^24.10.0"
+
+[tool.poetry.scripts]
+log-analyser = "log_analyser.main:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
