@@ -5,7 +5,8 @@ from typing import Annotated, Any, List
 
 import typer
 
-from log_analyser.io import output_writer
+from log_analyser.exceptions import InvalidDataFormatError
+from log_analyser.io import output_writer, input_parser
 from log_analyser.metrics import (
     MetricsCode,
     IPFrequencyMetric,
@@ -13,7 +14,6 @@ from log_analyser.metrics import (
     TotalAmountOfBytesExchangedMetric,
 )
 from log_analyser.metrics.base import Metric
-from log_analyser.readers import get_file_reader
 
 fmt = "%(message)s"
 logging.basicConfig(level=logging.INFO, format=fmt)
@@ -110,6 +110,7 @@ def main(
     input arguments and return the results of the operations as output.
     """
     output_writer.select_strategy(output_format)
+    input_parser.select_strategy(input_format)
 
     metrics: List[Metric] = []
     try:
@@ -124,17 +125,16 @@ def main(
             logger.error("No option was provided for analysis")
             raise typer.Exit()
 
-        file_reader = get_file_reader(input_format)
-        logs_readers = [
-            file_reader(input_file) for input_file in input_file_paths
+        logs_parsers = [
+            input_parser.parse(input_file) for input_file in input_file_paths
         ]
         summary = asyncio.run(
-            analyze_multiple_log_sources(logs_readers, metrics)
+            analyze_multiple_log_sources(logs_parsers, metrics)
         )
 
         output_writer.write(output_file_path, summary)
 
-    except NotImplementedError as e:
+    except (InvalidDataFormatError, NotImplementedError) as e:
         logger.error(e)
 
     logger.info("Finished.")
