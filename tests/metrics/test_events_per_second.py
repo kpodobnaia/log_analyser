@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
 from log_analyser.metrics import MetricsCode
-from log_analyser.metrics.events_per_second import EventsPerRecordMetric
+from log_analyser.metrics.events_per_second import EventsPerSecondMetric
 
 
 def test_events_per_second():
     now = datetime.now()
-    metric = EventsPerRecordMetric()
+    metric = EventsPerSecondMetric()
 
     metric.collect(MagicMock(timestamp=now))
     metric.collect(MagicMock(timestamp=now))
@@ -24,6 +24,6 @@ def test_events_per_second():
 
 
 def test_events_per_second_empty():
-    metric = EventsPerRecordMetric()
+    metric = EventsPerSecondMetric()
 
     assert metric.summarize() == {}

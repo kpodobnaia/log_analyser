@@ -5,7 +5,7 @@ from log_analyser.log import LogEntry
 from log_analyser.metrics.base import Metric
 
 
-class EventsPerRecordMetric(Metric):
+class EventsPerSecondMetric(Metric):
     """
     EPS is determined by dividing the total number of events generated within
     a specific time period by the duration of that time period.
