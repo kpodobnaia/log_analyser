@@ -1,0 +1,16 @@
+1157689350.829   1393 10.105.33.214 TCP_MISS/200 382 POST http://shttp.msg.yahoo.com/notify/ username DIRECT/216.155.194.239 text/plain
+1157689353.439   3667 10.105.33.214 TCP_MISS/200 24095 GET http://insider.msg.yahoo.com/? username DIRECT/68.142.194.14 text/html
+1157689353.939   4899 10.105.33.214 TCP_MISS/200 22964 GET http://radio.launch.yahoo.com/radio/play/playmessenger.asp username DIRECT/68.142.219.132 text/html
+1157689354.877   1349 10.105.33.214 TCP_MISS/200 646 POST http://shttp.msg.yahoo.com/notify/ username DIRECT/216.155.194.239 text/plain
+1157689355.517   1578 10.105.33.214 TCP_MISS/200 699 GET http://address.yahoo.com/yab/us? username DIRECT/209.191.93.51 text/xml
+1157689356.907   6741 10.105.21.199 TCP_MISS/302 734 GET http://fxfeeds.mozilla.org/rss20.xml username2 DIRECT/63.245.209.21 text/html
+1157689357.267   6424 10.105.33.214 TCP_MISS/200 31400 GET http://insider.msg.yahoo.com/ycontent/? username DIRECT/68.142.231.252 text/xml
+1157689357.720   2831 10.105.33.214 TCP_MISS/200 21152 GET http://insider.msg.yahoo.com/ycontent/? username DIRECT/68.142.194.14 text/xml
+1157689358.173      1 10.105.37.17 TCP_DENIED/407 1667 CONNECT us.mcafee.com:443 - NONE/- text/html
+1157689358.174      0 10.105.37.17 TCP_DENIED/407 1767 POST http://us.mcafee.com/apps/agent/submgr/appinstru.asp - NONE/- text/html
+1157689358.174      0 10.105.37.17 TCP_DENIED/407 1761 POST http://us.mcafee.com/apps/agent/submgr/appsync.asp - NONE/- text/html
+1157689358.226      0 10.105.37.17 TCP_DENIED/407 1667 CONNECT us.mcafee.com:443 - NONE/- text/html
+1157689358.486    711 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations.gif username DIRECT/68.142.219.132 -
+1157689358.683      0 10.105.37.17 TCP_DENIED/407 1667 CONNECT us.mcafee.com:443 - NONE/- text/html
+1157689359.199    713 10.105.33.214 TCP_REFRESH_HIT/304 512 GET http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations_over.gif username DIRECT/68.142.219.132 -
+1157689359.269   1982 10.105.33.214 TCP_MISS/200 362 POST http://shttp.msg.yahoo.com/notify/ username DIRECT/216.155.194.239 text/plain
