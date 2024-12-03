@@ -22,7 +22,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# app = typer.Typer()
+app = typer.Typer()
 
 
 async def collect_metrics_from_logs(log_reader, metrics):
@@ -73,7 +73,23 @@ async def analyser(
     )
 
 
-# @app.command()
+def validate_input_format(input_format: str):
+    if input_format not in input_parser.supported_formats:
+        raise typer.BadParameter(
+            f"Input format {input_format} is not supported."
+        )
+    return input_format
+
+
+def validate_output_format(output_format: str):
+    if output_format not in output_writer.supported_formats:
+        raise typer.BadParameter(
+            f"Output format {output_format} is not supported."
+        )
+    return output_format
+
+
+@app.command()
 def main(
     input_file_paths: Annotated[
         List[Path],
@@ -96,33 +112,33 @@ def main(
         ),
     ],
     input_format: str = typer.Option(
-        "csv", help="Expected format of the input files"
+        "csv",
+        help="Expected format of the input files",
+        callback=validate_input_format,
     ),
     output_format: str = typer.Option(
-        "json", help="Expected format of the output file"
+        "json",
+        help="Expected format of the output file",
+        callback=validate_output_format,
     ),
     most_frequent_ip: bool = typer.Option(
         False,
         f"--{MetricsCode.MOST_FREQUENT_IP}",
-        is_flag=True,
         help="Most frequent IP",
     ),
     least_frequent_ip: bool = typer.Option(
         False,
         f"--{MetricsCode.LEAST_FREQUENT_IP}",
-        is_flag=True,
         help="Least frequent IP",
     ),
     events_per_second: bool = typer.Option(
         False,
         f"--{MetricsCode.EVENTS_PER_SECOND}",
-        is_flag=True,
         help="Events per second",
     ),
     total_amount_of_bytes: bool = typer.Option(
         False,
         f"--{MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED}",
-        is_flag=True,
         help="Total amount of bytes exchanged",
     ),
 ) -> None:
@@ -145,8 +161,7 @@ def main(
     }
 
     if not any(options.values()):
-        logger.error("No option was provided for analysis")
-        raise typer.Exit()
+        raise typer.BadParameter("No option was provided for analysis")
 
     try:
         metrics = metrics_provider.provide_metrics(
@@ -166,5 +181,6 @@ def main(
         logger.error(e)
 
 
-if __name__ == "__main__":
-    typer.run(main)
+#
+# if __name__ == "__main__":
+#     typer.run(main)
