@@ -9,6 +9,7 @@ packages = [{ include = "log_analyser" }]
 [tool.poetry.dependencies]
 python = "^3.11"
 typer = { extras = ["all"], version = "^0.13.1" }
+pytest-asyncio = "^0.24.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -22,8 +23,9 @@ line-length = 79
 
 [tool.pytest.ini_options]
 testpaths = [
-    "tests",
+    "tests"
 ]
+asyncio_default_fixture_loop_scope = "session"
 
 [tool.poetry.scripts]
 log-analyser = "log_analyser.main:app"

@@ -2,15 +2,20 @@ import asyncio
 import logging
 import sys
 from pathlib import Path
-from typing import Annotated, Any, List
+from typing import Annotated, List
 
 import typer
 
+from log_analyser.analyser import LogsAnalyser
 from log_analyser.exceptions import InvalidDataFormatError
 from log_analyser.io import output_writer, input_parser
 from log_analyser.metrics import (
     MetricsCode,
     metrics_provider,
+)
+from log_analyser.validators import (
+    validate_input_format,
+    validate_output_format,
 )
 
 fmt = "[%(asctime)s] [%(levelname)s] %(message)s"
@@ -23,70 +28,6 @@ logger = logging.getLogger(__name__)
 
 
 app = typer.Typer()
-
-
-async def collect_metrics_from_logs(log_reader, metrics):
-    for log in log_reader:
-        for metric in metrics:
-            metric.collect(log)
-
-
-async def analyze_multiple_log_sources(log_readers, metrics) -> dict[str, Any]:
-    """
-    Analyze multiple log sources by creating a task for each of
-    the `log_readers` and return their common
-    :param log_readers: iterators that read lines from a selected file and
-            parse them into Log objects
-    :param metrics: Metrics objects that collect the statistics from all
-            `log_readers` and summarize their common result
-    :return:
-    """
-    tasks = [
-        asyncio.create_task(collect_metrics_from_logs(log_reader, metrics))
-        for log_reader in log_readers
-    ]
-    await asyncio.gather(*tasks)
-
-    summary: dict[str, Any] = {}
-    # metric objects accumulate the statistics for logs from all sources
-    for metric in metrics:
-        summary |= metric.summarize()
-    return summary
-
-
-async def analyser(
-    logs_parsers, output_writer, output_file_path, metrics, options
-):
-    summary = await analyze_multiple_log_sources(logs_parsers, metrics)
-
-    # trade-off for allowing to process multiple options by the same metric
-    filtered_summary = {
-        key: value
-        for key, value in summary.items()
-        if key in options and options[key]
-    }
-
-    output_writer.write(output_file_path, filtered_summary)
-    logger.info(
-        "Saved analysis summary into a file %s",
-        str(output_file_path),
-    )
-
-
-def validate_input_format(input_format: str):
-    if input_format not in input_parser.supported_formats:
-        raise typer.BadParameter(
-            f"Input format {input_format} is not supported."
-        )
-    return input_format
-
-
-def validate_output_format(output_format: str):
-    if output_format not in output_writer.supported_formats:
-        raise typer.BadParameter(
-            f"Output format {output_format} is not supported."
-        )
-    return output_format
 
 
 @app.command()
@@ -138,7 +79,7 @@ def main(
     ),
     total_amount_of_bytes: bool = typer.Option(
         False,
-        f"--{MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED}",
+        f"--{MetricsCode.TOTAL_AMOUNT_OF_BYTES}",
         help="Total amount of bytes exchanged",
     ),
 ) -> None:
@@ -157,24 +98,25 @@ def main(
         MetricsCode.MOST_FREQUENT_IP: most_frequent_ip,
         MetricsCode.LEAST_FREQUENT_IP: least_frequent_ip,
         MetricsCode.EVENTS_PER_SECOND: events_per_second,
-        MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED: total_amount_of_bytes,
+        MetricsCode.TOTAL_AMOUNT_OF_BYTES: total_amount_of_bytes,
     }
 
     if not any(options.values()):
         raise typer.BadParameter("No option was provided for analysis")
 
     try:
-        metrics = metrics_provider.provide_metrics(
-            [option for option, enabled in options.items() if enabled]
-        )
-
         logs_parsers = [
             input_parser.parse(input_file) for input_file in input_file_paths
         ]
-        asyncio.run(
-            analyser(
-                logs_parsers, output_writer, output_file_path, metrics, options
-            )
+
+        analyser = LogsAnalyser(logs_parsers, metrics_provider, options)
+        asyncio.run(analyser.analyse())
+
+        output_writer.write(output_file_path, analyser.summarise())
+
+        logger.info(
+            "Saved analysis summary into a file %s",
+            str(output_file_path),
         )
 
     except (InvalidDataFormatError, NotImplementedError) as e:

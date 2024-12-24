@@ -9,7 +9,7 @@ metrics_provider.register(MetricsCode.MOST_FREQUENT_IP, IPFrequencyMetric)
 metrics_provider.register(MetricsCode.LEAST_FREQUENT_IP, IPFrequencyMetric)
 metrics_provider.register(MetricsCode.EVENTS_PER_SECOND, EventsPerSecondMetric)
 metrics_provider.register(
-    MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED,
+    MetricsCode.TOTAL_AMOUNT_OF_BYTES,
     TotalAmountOfBytesExchangedMetric,
 )
 

@@ -11,7 +11,7 @@ def test_total_amount_of_bytes_exchanged():
         metric.collect(MagicMock(response_size_in_bytes=size))
 
     assert metric.summarize() == {
-        MetricsCode.TOTAL_AMOUNT_OF_BYTES_EXCHANGED: sum(sizes)
+        MetricsCode.TOTAL_AMOUNT_OF_BYTES: sum(sizes)
     }
 
 
