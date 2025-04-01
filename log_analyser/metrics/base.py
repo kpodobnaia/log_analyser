@@ -1,7 +1,7 @@
 import abc
 from typing import Any, Type
 
-from log_analyser.log import LogEntry
+from log_analyser.log_entry import LogEntry
 
 
 class Metric(abc.ABC):

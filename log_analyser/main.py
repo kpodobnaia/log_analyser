@@ -1,6 +1,4 @@
 import asyncio
-import logging
-import sys
 from pathlib import Path
 from typing import Annotated, List
 
@@ -9,6 +7,7 @@ import typer
 from log_analyser.analyser import LogsAnalyser
 from log_analyser.exceptions import InvalidDataFormatError
 from log_analyser.io import output_writer, input_parser
+from log_analyser.logging import logging
 from log_analyser.metrics import (
     MetricsCode,
     metrics_provider,
@@ -18,16 +17,15 @@ from log_analyser.validators import (
     validate_output_format,
 )
 
-fmt = "[%(asctime)s] [%(levelname)s] %(message)s"
-logging.basicConfig(
-    level=logging.INFO,
-    format=fmt,
-    handlers=[logging.StreamHandler(stream=sys.stdout)],
-)
 logger = logging.getLogger(__name__)
 
 
-app = typer.Typer()
+app = typer.Typer(
+    help="""A command-line tool to analyze the content of log files.
+    The tool accepts the log file location(s) and operation(s) as
+    input arguments and return the results of the operations as output.
+    """
+)
 
 
 @app.command()
@@ -83,10 +81,6 @@ def main(
         help="Total amount of bytes exchanged",
     ),
 ) -> None:
-    """A command-line tool to analyze the content of log files.
-    The tool accepts the log file location(s) and operation(s) as
-    input arguments and return the results of the operations as output.
-    """
     logger.info(
         "Start analysing logs in files: %s",
         ", ".join([str(f) for f in input_file_paths]),
@@ -113,11 +107,6 @@ def main(
         asyncio.run(analyser.analyse())
 
         output_writer.write(output_file_path, analyser.summarise())
-
-        logger.info(
-            "Saved analysis summary into a file %s",
-            str(output_file_path),
-        )
 
     except (InvalidDataFormatError, NotImplementedError) as e:
         logger.error(e)

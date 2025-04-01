@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any, Iterator, List, Dict
 
-from log_analyser.log import LogEntry
+from log_analyser.log_entry import LogEntry
 from log_analyser.metrics.base import MetricsProvider
 
 

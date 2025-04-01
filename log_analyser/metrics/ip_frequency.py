@@ -1,7 +1,7 @@
 from collections import Counter
 from typing import Any
 
-from log_analyser.log import LogEntry
+from log_analyser.log_entry import LogEntry
 from log_analyser.metrics.base import Metric
 from log_analyser.metrics.metrics_codes import MetricsCode
 
