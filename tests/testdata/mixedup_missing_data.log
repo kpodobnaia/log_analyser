@@ -1,0 +1,3 @@
+1157689321.315 10.105.21.199 TCP_HIT/200 1464 GET http://www.goonernews.com/styles.css NONE/- username
+1157689322.780 10.105.21.199 TCP_HIT/200 5626 GET http://www.google-analytics.com/urchin.js NONE/- username
+1157689323.718 10.105.21.199 TCP_MISS/200 30169 GET http://www.goonernews.com/ DIRECT/207.58.145.61 username

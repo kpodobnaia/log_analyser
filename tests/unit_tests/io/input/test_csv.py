@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from log_analyser.io.input.csv import CSVInputParserStrategy
-from log_analyser.log import LogEntry
+from log_analyser.log_entry import LogEntry
 
 
 @patch("csv.reader")
